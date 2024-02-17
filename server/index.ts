@@ -2,6 +2,8 @@ import express from 'express';
 import mongoose, { Schema, Document, Model } from 'mongoose';
 import dotenv from 'dotenv'
 import { UserRouter } from './src/routes/UserRoutes';
+import { RecipeRouter } from './src/routes/RecipeRoute';
+import { IngredientsRouter } from './src/routes/IngredientsRoute';
 
 dotenv.config()
 
@@ -17,6 +19,9 @@ app.use(express.json());
 
 app.use("/api/user",UserRouter)
 
+app.use("/api/recipe",RecipeRouter)
+
+app.use("/api/ingredients",IngredientsRouter);
 // Start the server
 // Connect to MongoDB
 mongoose.connect(MONGO_DB_URI)

@@ -4,6 +4,7 @@ import mongoose, { Document, Schema, Model } from 'mongoose';
 interface Ingredient {
     name: string;
     quantity: string;
+    image:string;
 }
 
 interface Instruction{
@@ -22,7 +23,8 @@ interface Recipe extends Document {
 
 const ingredientSchema = new Schema<Ingredient>({
     name: { type: String, required: true },
-    quantity: { type: String, required: true }
+    quantity: { type: String, required: true },
+    image:{ type:String, required:true }
 });
 
 const instructionSchema=new Schema<Instruction>({
