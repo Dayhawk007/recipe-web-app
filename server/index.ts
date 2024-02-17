@@ -14,7 +14,7 @@ const MONGO_DB_URI=process.env.MONGO_DB_URI || "mongodb://127.0.0.1:27017/recipe
 // Create Express app
 const app = express();
 
-// Middleware
+
 app.use(express.json());
 
 app.use("/api/user",UserRouter)

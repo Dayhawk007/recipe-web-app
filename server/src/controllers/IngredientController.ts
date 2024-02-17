@@ -18,11 +18,11 @@ export const searchIngredient = async(req:Request,res:Response)=>{
     const regexPattern = new RegExp(searchTerm as string, 'i');
     const pipeline = [
         {
-            $unwind: '$ingredients' // Unwind the ingredients array
+            $unwind: '$ingredients' 
         },
         {
             $match: {
-                'ingredients.name': { $regex: regexPattern } // Match ingredients by name using regex
+                'ingredients.name': { $regex: regexPattern } 
             }
         },
         {
@@ -31,13 +31,13 @@ export const searchIngredient = async(req:Request,res:Response)=>{
                 ingredients: { $addToSet: {
                     name:"$ingredients.name",
                     image:"$ingredients.image"
-                } } // Add matched ingredients to a set
+                } } 
             }
         },
         {
             $project: {
                 _id: 0,
-                ingredients: 1 // Project only the ingredients field
+                ingredients: 1 
             }
         }
     ];

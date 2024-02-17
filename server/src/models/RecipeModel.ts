@@ -1,6 +1,6 @@
 import mongoose, { Document, Schema, Model } from 'mongoose';
 
-// Define the ingredient schema
+
 interface Ingredient {
     name: string;
     quantity: string;

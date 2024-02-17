@@ -37,7 +37,7 @@ export const searchRecipeWithIngredients= async(req:Request,res:Response) => {
     const pipeline = [
         {
             $match: {
-                'ingredients.name': { $all: searchIngredients } // Match recipes where ingredients array contains all search ingredients
+                'ingredients.name': { $all: searchIngredients } 
             }
         },
         {
