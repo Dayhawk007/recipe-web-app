@@ -1,5 +1,5 @@
 import { Request,Response } from "express"
-import UserModel from "../models/UserModel";
+import {UserModel} from "../models/UserModel";
 import bcrypt from 'bcrypt'
 import { HttpStatusCodes } from "../config/httpCodes";
 
@@ -16,9 +16,10 @@ export const signUp=async(req:Request,res:Response)=>{
         await user.save();
     
         const token = user.generateAuthToken();
-        res.status(HttpStatusCodes.CREATED).json({ user, token });
+        console.log("User Signed up "+user)
+        return res.status(HttpStatusCodes.CREATED).json({ user, token });
       } catch (err:any) {
-        res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ error: err.message });
+        return res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ error: err.message });
     }
 }
 
@@ -38,8 +39,30 @@ export const signIn= async(req:Request,res:Response)=>{
         }
     
         const token = user.generateAuthToken();
-        res.status(HttpStatusCodes.OK).json({ user, token });
+        console.log("User logged in "+user)
+        return res.status(HttpStatusCodes.OK).json({ user, token });
       } catch (err:any) {
-        res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ error: err.message });
+        return res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).json({ error: err.message });
     }
+}
+
+export const getUserInfo=async(req:Request,res:Response)=>{
+  //@ts-ignore
+  const user=req.user;
+
+  try{
+    if(!user){
+      return res.status(HttpStatusCodes.NOT_FOUND).send({
+        "message":"User not found/Auth invalid"
+      })
+    }
+    else{
+      return res.status(HttpStatusCodes.OK).send(user);
+    }
+  }
+  catch(err:any){
+    return res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).send({
+      "message":err.message
+    })
+  }
 }

@@ -1,6 +1,8 @@
 'use client'
+import { useState, ChangeEvent, FormEvent } from "react";
 import Image from "next/image";
-import React, { useState, ChangeEvent, FormEvent } from "react";
+import { useRouter } from "next/navigation";
+import Cookies from "js-cookie";
 
 const SignUp: React.FC = () => {
     const [signUpData, setSignUpData] = useState<{ username: string; email: string; password: string }>({
@@ -8,16 +10,32 @@ const SignUp: React.FC = () => {
         email: '',
         password: '',
     });
+    
+    const router = useRouter();
 
     const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
         setSignUpData({ ...signUpData, [name]: value });
     };
 
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-        // Implement sign up logic here
+        const response = await fetch("http://127.0.0.1:5000/api/user/sign-up", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify(signUpData),
+        });
+        const data = await response.json();
+        if (response.ok) {
+            Cookies.set("token", data.token); // Store the token in cookies
+            router.push("/recipe-maker"); // Redirect to recipe maker page
+        } else {
+            // Handle sign up error
+        }
     };
+
     return (
         <div className="flex flex-col relative overflow-hidden h-screen w-screen justify-center z-10 items-center">
             <Image src="/images/login-bg.png" alt="Background Image" height={1200} width={1550} className="absolute top-0 left-0 -z-10" />
@@ -76,7 +94,7 @@ const SignUp: React.FC = () => {
                 <p className="self-center text-sm font-medium text-dark-gray">Already have an account? <span className="text-secondary font-medium">Log In</span></p>
             </div>
         </div>
-    )
-}
+    );
+};
 
-export default SignUp
+export default SignUp;
