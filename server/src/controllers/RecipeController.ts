@@ -82,3 +82,30 @@ export const searchRecipeWithIngredients= async(req:Request,res:Response) => {
     return res.status(HttpStatusCodes.OK).send(recipes);
 
 }
+
+export const getRecipeById=async(req:Request,res:Response)=>{
+    try {
+        const id=req.params.id || "";
+
+        if(id===""){
+            return res.status(HttpStatusCodes.BAD_REQUEST).send({
+                "message":"Id cannot be empty"
+            })
+        }
+
+        const recipe=await RecipeModel.findById(id);
+
+        if(recipe===undefined){
+            return res.status(HttpStatusCodes.NOT_FOUND).send({
+                "message":"Recipe not found for ID"
+            })
+        }
+
+        return res.status(HttpStatusCodes.OK).send(recipe);
+        
+    } catch (error:any) {
+        return res.status(HttpStatusCodes.INTERNAL_SERVER_ERROR).send({
+            "message":error.message
+        })
+    }
+}

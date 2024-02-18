@@ -1,55 +1,287 @@
-"use client"
-import { useEffect, useState } from 'react';
-import Image from 'next/image';
-import Cookies from 'js-cookie';
+"use client";
+import { useEffect, useState, ChangeEvent, FormEvent } from "react";
+import Image from "next/image";
+import Cookies from "js-cookie";
+import { FontAwesomeIcon } from "@fortawesome/react-fontawesome";
+import { useRouter } from "next/navigation";
+import Card from "../ui-components/IngredientCard";
+import { faClock } from "@fortawesome/free-solid-svg-icons";
+import Link from "next/link";
+
 const RecipeMaker = () => {
-  const [userInfo, setUserInfo] = useState(null);
+    const [userInfo, setUserInfo] = useState(null);
+    const [query, setQuery] = useState("");
+    const [queryChanged, setQueryChanged] = useState<boolean>(false);
+    const [token, setToken] = useState(Cookies.get("token"));
+    const [ingredients, setIngredients] = useState([]);
+    const [debounceDelay, setDebounceDelay] = useState(500);
+    const [selecetdIngredients,setSelecetedIngredients]=useState([]);
+    const [recipes,setRecipes]=useState([]);
 
-  useEffect(() => {
-    const fetchUserInfo = async () => {
-      try {
+    const router = useRouter();
 
-        const token=Cookies.get("token") || "";
-
-        const response = await fetch('http://127.0.0.1:5000/api/user/user-info',
-        {   
-            method:'GET',
-            headers:{
-                Authorization:`Bearer ${token}`,
-                'Content-Type': 'application/json',
+    async function onSearch(query: string) {
+        const searchResults = await fetch(
+            "http://127.0.0.1:5000/api/ingredients/search?searchTerm=" + query,
+            {
+                method: "GET",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
             }
-        }
-        ); // Assuming the API route is defined in /pages/api/getUserInfo.js
+        );
 
+        const searchResultsData = await searchResults.json();
+
+        const ingredientsFinalArray = searchResultsData[0]["ingredients"].filter((ingredient) => {
+            return !selecetdIngredients.some((selectedIngredient) => selectedIngredient.name === ingredient.name);
+        });
+
+        console.log(ingredientsFinalArray)
+
+        setIngredients(ingredientsFinalArray);
+    }
+
+
+    async function getRecipes(ingredients:Array<{}>){
+        try{
+        const recipeResponseObject=await fetch(
+            "http://127.0.0.1:5000/api/recipe/searchRecipe",
+            {
+                method:'POST',
+                body:JSON.stringify({
+                    searchIngredients:ingredients.map((item)=>item.name)
+                }),
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+
+        const recipesJson=await recipeResponseObject.json();
+        setRecipes(recipesJson);
+        console.log(recipesJson);
+        }
+        catch(err:any){
+            console.log(err.message)
+        }
+
+    }
+
+    useEffect(()=>{
+        console.log(selecetdIngredients);
+        setIngredients(ingredients.filter((item)=>!selecetdIngredients.includes(item)));
+    },[selecetdIngredients])
+
+    useEffect(() => {
         
-
-        if (!response.ok) {
-          throw new Error('Failed to fetch user info');
+        let timer: NodeJS.Timeout;
+        if (queryChanged) {
+            timer = setTimeout(() => {
+                onSearch(query);
+                setQueryChanged(false); // Reset the flag
+            }, debounceDelay);
         }
-        const data = await response.json();
-        setUserInfo(data);
-      } catch (error) {
-        console.error('Error fetching user info:', error);
-      }
+
+        return () => {
+            clearTimeout(timer);
+        };
+        
+    }, [query, onSearch, debounceDelay,queryChanged]);
+
+    useEffect(()=>{
+        onSearch(query);
+    },[]);
+
+    const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
+        setQuery(e.target.value);
     };
 
-    fetchUserInfo();
-  }, []);
+    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        onSearch(query);
+    };
 
-  return (
-    <div className="flex flex-col items-center justify-center min-h-screen">
-      <h1 className="text-3xl font-bold mb-4">Welcome to Recipe Maker</h1>
-      {userInfo ? (
-        <div className="bg-gray-200 p-4 rounded-md">
-          <p className="text-lg">Hello, {userInfo.username}!</p>
-          <p className="text-sm">Email: {userInfo.email}</p>
+    useEffect(() => {
+        const fetchUserInfo = async () => {
+            try {
+                const response = await fetch(
+                    "http://127.0.0.1:5000/api/user/user-info",
+                    {
+                        method: "GET",
+                        headers: {
+                            Authorization: `Bearer ${token}`,
+                            "Content-Type": "application/json",
+                        },
+                    }
+                ); // Assuming the API route is defined in /pages/api/getUserInfo.js
+
+                if (!response.ok) {
+                    router.push("/login");
+                    throw new Error("Failed to fetch user info");
+                }
+                const data = await response.json();
+                setUserInfo(data);
+            } catch (error) {
+                console.error("Error fetching user info:", error);
+            }
+        };
+
+        fetchUserInfo();
+    }, []);
+
+    
+
+    return (
+        <div className="flex flex-col items-center py-8 px-28 space-y-6 h-screen w-screen rounded-md  bg-white overflow-hidden">
+            <div className="flex flex-row justify-between w-full items-center">
+                {userInfo ? (
+                    <div className="flex flex-row items-center p-2 space-x-2">
+                        <Image
+                            className="rounded-full"
+                            src={"/images/avatar.png"}
+                            width={60}
+                            height={60}
+                            alt="Profile pic"
+                        />
+                        <div className="flex flex-col items-start space-y-1">
+                            <h4 className="text-xl text-primary font-medium ">
+                                Hello, {userInfo.username}
+                            </h4>
+                            <p className="text-sm text-primary font-normal">Let's cook!</p>
+                        </div>
+                    </div>
+                ) : (
+                    <p>Loading user info...</p>
+                )}
+                {recipes.length!==0
+                ?
+                (
+                    <div className="flex flex-col text-black space-y-1 w-10/12 items-center">
+                        <h6 className="text-sm">Whoosh..... Here are the</h6>
+                        <h2 className="text-xl">Personalized Recipes for your pantry</h2>
+                    </div>
+                ):
+                <form
+                    onSubmit={handleSubmit}
+                    className="flex w-3/4 justify-center items-center"
+                >
+                    <input
+                        type="text"
+                        placeholder="Enter search term"
+                        value={query}
+                        onChange={handleChange}
+                        className="border w-full text-black border-black text-lg rounded-2xl py-6 px-8 mr-2 focus:outline-none focus:border-blue-500"
+                    />
+                </form>
+                }
+            </div>
+            {recipes.length===0
+            ?
+            <div className="flex flex-row items-start overflow-scroll space-x-4 py-2 justify-start w-full">
+                <div className="flex flex-col w-full space-y-3 items-start py-2">
+                    {selecetdIngredients.length===0
+                    ?
+                    null
+                    :
+                    (   <>
+                        <h4 className="text-xl text-black py-1 border-b-2 border-b-black">Selected Ingredients</h4>
+                        <div className="w-full grid grid-cols-5 gap-x-3 gap-y-6">
+                        {selecetdIngredients.map((item) => {
+                            return (
+                                <Card
+                                    key={item.name} // Add a unique key for each item in the map function
+                                    name={item.name}
+                                    imageUrl={item.image}
+                                    buttonText="Remove"
+                                    onClick={() => { 
+                                        setSelecetedIngredients(prevState => prevState.filter((selected)=>selected!==item));
+                                        setIngredients(prevState=>[...prevState,item])
+                                    }}
+                                />
+                            );
+                        })}
+                        </div>
+                        </>
+                    )
+                }
+                    <h4 className="text-xl text-black py-1 border-b-2 border-b-black">Available Ingredients</h4>
+                    <div className="w-full pb-4 grid grid-cols-5 pr-4 gap-x-3 gap-y-6">
+                        {ingredients.map((item) => {
+                            return (
+                                <Card
+                                    key={item.name} // Add a unique key for each item in the map function
+                                    name={item.name}
+                                    imageUrl={item.image}
+                                    buttonText="Add"
+                                    onClick={() => { 
+                                        setSelecetedIngredients(prevState => [...prevState,item] );
+                                    }}
+                                />
+                            );
+                        })}
+                    </div>
+                    <button className="bg-black hover:bg-gray-900 px-6 py-3 rounded-xl text-white" onClick={()=>getRecipes(selecetdIngredients)}>Let's cook!</button>
+                </div>
+            </div>
+            :
+            (
+                <div className="flex flex-col w-10/12 items-center space-y-4 text-black">
+                    {recipes.map((recipe,index)=>{
+                        if(index===0){
+                        return (
+                            <div className="flex flex-col bg-primary rounded-xl w-full py-8 px-12 items-start space-y-6">
+                                <h2 className="text-3xl text-secondary font-medium">Top Result</h2>
+                                <Link className="w-full" href={`/recipe-maker/${recipe._id}`}>
+                                <div className="flex flex-row items-center justify-between w-full px-8 py-8 border border-secondary rounded-xl">
+                                    <h4 className="text-base text-white font-semibold">{recipe.title}</h4>
+                                    <div className="flex flex-row space-x-2 items-center"> 
+                                        <FontAwesomeIcon className="text-white" icon={faClock} size={"2x"}></FontAwesomeIcon>
+                                        <h4 className="text-base text-white font-semibold">{recipe.cookingTime} minutes</h4>
+                                    </div>
+                                    <div className="flex flex-row space-x-4 items-center">
+                                        {recipe.matchedIngredients.map((item)=>{
+                                            return(
+                                                <div className="px-12 py-4 border text-white text-sm font-semibold border-white rounded-full">{item}</div>
+                                            )
+                                        })}
+                                    </div>
+                                </div>
+                                </Link>
+                            </div>
+                        )
+                        }
+                        else{
+                            return(
+                                <>
+                                <h2 className="text-gray-700 text-2xl self-start">Some more recipes....</h2>
+                                <Link className="w-full" href={`/recipe-maker/${recipe._id}`}>
+                                <div className="flex flex-row items-center justify-between w-full px-8 py-8 border border-primary rounded-xl">
+                                    <h4 className="text-base text-black font-semibold">{recipe.title}</h4>
+                                    <div className="flex flex-row space-x-2 items-center"> 
+                                        <FontAwesomeIcon className="text-black" icon={faClock} size={"2x"}></FontAwesomeIcon>
+                                        <h4 className="text-base text-black font-semibold">{recipe.cookingTime} minutes</h4>
+                                    </div>
+                                    <div className="flex flex-row space-x-4 items-center">
+                                        {recipe.matchedIngredients.map((item)=>{
+                                            return(
+                                                <div className="px-12 py-4 border text-black text-sm font-semibold border-black rounded-full">{item}</div>
+                                            )
+                                        })}
+                                    </div>
+                                </div>
+                                </Link>
+                                </>
+                            )
+                        }
+                    })}
+                </div>
+            )
+            }
         </div>
-      ) : (
-        <p>Loading user info...</p>
-      )}
-      <Image src="/recipe-image.jpg" alt="Recipe" width={300} height={200} className="mt-8" />
-    </div>
-  );
+    );
 };
 
 export default RecipeMaker;

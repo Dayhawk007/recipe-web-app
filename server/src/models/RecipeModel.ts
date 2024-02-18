@@ -15,6 +15,7 @@ interface Instruction{
 // Define the recipe schema
 interface Recipe extends Document {
     title: string;
+    image:string;
     description: string;
     ingredients: Ingredient[];
     instructions: Instruction[];
@@ -34,6 +35,7 @@ const instructionSchema=new Schema<Instruction>({
 
 const recipeSchema = new Schema<Recipe>({
     title: { type: String, required: true },
+    image:{type:String,default:""},
     description: { type: String, required: true },
     ingredients: [ingredientSchema],
     instructions: [instructionSchema],

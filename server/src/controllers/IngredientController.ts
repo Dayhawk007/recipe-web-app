@@ -8,13 +8,6 @@ export const searchIngredient = async(req:Request,res:Response)=>{
 
     console.log("Search term : ",searchTerm)
 
-    if(searchTerm===""){
-        return res.status(HttpStatusCodes.BAD_REQUEST).send(
-            {
-                "message":"Search term cannot be empty"
-            }
-        )
-    }
     const regexPattern = new RegExp(searchTerm as string, 'i');
     const pipeline = [
         {
