@@ -9,7 +9,7 @@ import { faAdd, faClock, faTrash } from "@fortawesome/free-solid-svg-icons";
 import Link from "next/link";
 
 const RecipeMaker = () => {
-    const [userInfo, setUserInfo] = useState(null);
+    const [userInfo, setUserInfo] = useState<any>(null);
     const [query, setQuery] = useState("");
     const [queryChanged, setQueryChanged] = useState<boolean>(false);
     const [token, setToken] = useState(Cookies.get("token"));
@@ -34,8 +34,8 @@ const RecipeMaker = () => {
 
         const searchResultsData = await searchResults.json();
 
-        const ingredientsFinalArray = searchResultsData[0]["ingredients"].filter((ingredient) => {
-            return !selecetdIngredients.some((selectedIngredient) => selectedIngredient.name === ingredient.name);
+        const ingredientsFinalArray = searchResultsData[0]["ingredients"].filter((ingredient:any) => {
+            return !selecetdIngredients.some((selectedIngredient:any) => selectedIngredient.name === ingredient.name);
         });
 
         console.log(ingredientsFinalArray)
@@ -51,7 +51,7 @@ const RecipeMaker = () => {
             {
                 method:'POST',
                 body:JSON.stringify({
-                    searchIngredients:ingredients.map((item)=>item.name)
+                    searchIngredients:ingredients.map((item:any)=>item.name)
                 }),
                 headers: {
                     Authorization: `Bearer ${token}`,
@@ -189,7 +189,7 @@ const RecipeMaker = () => {
                     (   <>
                         <h4 className="text-xl text-black py-1 border-b-2 border-b-black">Selected Ingredients</h4>
                         <div className="w-full grid grid-cols-3 md:grid-cols-5 gap-x-3 gap-y-6">
-                        {selecetdIngredients.map((item) => {
+                        {selecetdIngredients.map((item:any) => {
                             return (
                                 <Card
                                     key={item.name} // Add a unique key for each item in the map function
@@ -199,7 +199,8 @@ const RecipeMaker = () => {
                                     icon={faTrash}
                                     onClick={() => { 
                                         setSelecetedIngredients(prevState => prevState.filter((selected)=>selected!==item));
-                                        setIngredients(prevState=>[...prevState,item])
+                                        //@ts-ignore
+                                        setIngredients(prevState=>[...prevState,item]);
                                     }}
                                 />
                             );
@@ -210,7 +211,7 @@ const RecipeMaker = () => {
                 }
                     <h4 className="text-xl text-black py-1 border-b-2 border-b-black">Available Ingredients</h4>
                     <div className="w-full grid grid-cols-3 md:grid-cols-5 gap-x-3 gap-y-6">
-                        {ingredients.map((item) => {
+                        {ingredients.map((item:any) => {
                             return (
                                 <Card
                                     key={item.name} // Add a unique key for each item in the map function
@@ -219,6 +220,7 @@ const RecipeMaker = () => {
                                     icon={faAdd}
                                     iconColor="bg-black"
                                     onClick={() => { 
+                                        //@ts-ignore
                                         setSelecetedIngredients(prevState => [...prevState,item] );
                                     }}
                                 />
@@ -231,7 +233,7 @@ const RecipeMaker = () => {
             :
             (
                 <div className="flex flex-col w-full md:w-10/12 items-center space-y-4 text-black">
-                    {recipes.map((recipe,index)=>{
+                    {recipes.map((recipe:any,index)=>{
                         if(index===0){
                         return (
                             <div className="flex flex-col bg-primary rounded-xl w-full py-8 px-10 md:py-8 md:px-12 items-start space-y-4 md:space-y-6">
@@ -244,7 +246,7 @@ const RecipeMaker = () => {
                                         <h4 className="text-base text-white font-semibold">{recipe.cookingTime} minutes</h4>
                                     </div>
                                     <div className="flex flex-row md:space-x-2 space-x-4 overflow-x-scroll md:w-fit w-full items-center">
-                                        {recipe.matchedIngredients.map((item)=>{
+                                        {recipe.matchedIngredients.map((item:any)=>{
                                             return(
                                                 <div className="md:px-12 px-6 md:py-4 py-2 border text-white md:text-sm text-xs h-min font-semibold border-white rounded-full">{item}</div>
                                             )
@@ -267,7 +269,7 @@ const RecipeMaker = () => {
                                         <h4 className="text-base text-black font-semibold">{recipe.cookingTime} minutes</h4>
                                     </div>
                                     <div className="flex flex-row md:w-fit w-full overflow-scroll space-x-4 items-center">
-                                        {recipe.matchedIngredients.map((item)=>{
+                                        {recipe.matchedIngredients.map((item:any)=>{
                                             return(
                                                 <div className="md:px-12 px-6 py-2 md:text-sm text-xs  md:py-4 border text-black font-semibold border-black rounded-full">{item}</div>
                                             )

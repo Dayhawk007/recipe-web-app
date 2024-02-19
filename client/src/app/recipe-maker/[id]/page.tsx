@@ -9,7 +9,7 @@ const RecipePage=()=>{
 
     const [token,setToken]=useState(Cookies.get("token"));
 
-    const [recipe,setRecipe]=useState(null);
+    const [recipe,setRecipe]=useState<any>(null);
 
     const getRecipeById=async()=>{
         try {
@@ -52,7 +52,7 @@ const RecipePage=()=>{
                     <h3 className="text-3xl text-secondary font-semibold">{recipe.title}</h3>
                     <p className="text-xs overflow-auto">{recipe.description}</p>
                     <div className="grid grid-flow-col grid-rows-2 auto-cols-max gap-3 overflow-scroll items-center w-full">
-                        {recipe.ingredients.map((item)=>{
+                        {recipe.ingredients.map((item:any)=>{
                             return (
                                 <div className="px-4 py-2 w-fit border border-white rounded-full">{item.name}</div>
                             )
@@ -60,7 +60,7 @@ const RecipePage=()=>{
                     </div>
                     <h3 className="text-secondary font-semibold text-lg">Ingredients used:</h3>
                     <ul className="flex flex-col space-y-2 text-white marker:text-white">
-                        {recipe.ingredients.map((item,index)=>{
+                        {recipe.ingredients.map((item:any,index:number)=>{
                             return(
                                 <li>{index+1}. {item.name}, {item.quantity}</li>
                             )
@@ -73,7 +73,7 @@ const RecipePage=()=>{
                 <div className="flex flex-col text-black w-full md:w-2/4 h-full space-y-4 items-start py-10 px-8 border-2 border-black rounded-2xl">
                     <h3 className="text-3xl font-semibold">Instructions</h3>
                     <div className="flex flex-col space-y-2 text-sm">
-                        {recipe.instructions.map((item,index)=>{
+                        {recipe.instructions.map((item:any,index:number)=>{
                             return(
                                 <p>{index+1}. {item.text}</p>
                             )

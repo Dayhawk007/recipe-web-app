@@ -61,7 +61,7 @@ const Login: React.FC = () => {
 
     return (
         <div className="flex flex-col relative overflow-hidden h-screen w-screen justify-center z-10 items-center">
-            <Image src="/images/login-bg.png" alt="Background Image" height={1200} width={1550} className="absolute top-0 left-0 -z-10" />
+            <Image src="/images/login-bg.png" alt="Background Image" layout="fill" className="absolute top-0 left-0 -z-10" />
             <div className="flex flex-col bg-primary items-start space-y-6 md:px-40 md:py-12 px-12 py-8 md:w-5/12 w-3/4 rounded-2xl">
                 <h4 className="text-3xl text-white">Log In</h4>
                 <form className="w-full" onSubmit={handleSubmit}>
