@@ -15,7 +15,7 @@ const RecipePage=()=>{
         try {
             const id=searchParams.id;
             const recipeResponse=await fetch(
-                "http://127.0.0.1:5000/api/recipe/"+id,
+                "/api/recipe/"+id,
                 {
                     method:'GET',
                     headers: {

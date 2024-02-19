@@ -33,7 +33,7 @@ const SignUp: React.FC = () => {
         e.preventDefault();
         try {
             await validationSchema.validate(signUpData, { abortEarly: false });
-            const response = await fetch("http://127.0.0.1:5000/api/user/sign-up", {
+            const response = await fetch("/api/user/sign-up", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",

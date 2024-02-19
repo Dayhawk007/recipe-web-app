@@ -22,7 +22,7 @@ const RecipeMaker = () => {
 
     async function onSearch(query: string) {
         const searchResults = await fetch(
-            "http://127.0.0.1:5000/api/ingredients/search?searchTerm=" + query,
+            "/api/ingredients/search?searchTerm=" + query,
             {
                 method: "GET",
                 headers: {
@@ -47,7 +47,7 @@ const RecipeMaker = () => {
     async function getRecipes(ingredients:Array<{}>){
         try{
         const recipeResponseObject=await fetch(
-            "http://127.0.0.1:5000/api/recipe/searchRecipe",
+            "/api/recipe/searchRecipe",
             {
                 method:'POST',
                 body:JSON.stringify({
@@ -108,7 +108,7 @@ const RecipeMaker = () => {
         const fetchUserInfo = async () => {
             try {
                 const response = await fetch(
-                    "http://127.0.0.1:5000/api/user/user-info",
+                    "/api/user/user-info",
                     {
                         method: "GET",
                         headers: {

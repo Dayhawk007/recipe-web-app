@@ -31,7 +31,7 @@ const Login: React.FC = () => {
         try {
             await schema.validate(loginData, { abortEarly: false });
             // If validation passes, proceed with form submission
-            const response = await fetch("http://127.0.0.1:5000/api/user/sign-in", {
+            const response = await fetch("/api/user/sign-in", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -43,7 +43,7 @@ const Login: React.FC = () => {
                 Cookies.set("token", data.token); // Store the token in cookies
                 router.push("/recipe-maker"); // Redirect to recipe maker page
             } else {
-                // Handle login error
+                alert("Wrong Credentials or Invalid Request");
             }
         } catch (error) {
             // Handle validation errors
