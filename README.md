@@ -1,10 +1,10 @@
 # Recipe Web App
 
-Status:Backend Complete(without auth), base APIs ready, frontend and auth WIP
 
-To run the backend-
-`cd server`
-`npm i`
-`tsc`
-`node ./dist/index.js` (Will add this as a package.json at the end)
+To run the backend and frontend, please run the backend at port 5000(proxy haven't been configured)-
+
+`cd server && npm i && npm run start`
+
+`cd client && npm run dev`
+
 
