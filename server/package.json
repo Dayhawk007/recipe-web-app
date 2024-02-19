@@ -6,10 +6,12 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "tsc && node ./dist/index.js",
-    "build":"tsc",
-    "add-build":"git add dist"
+    "build": "rimraf dist && tsc",
+    "ts.check": "tsc --project tsconfig.json",
+    "add-build": "git add dist"
   },
   "pre-commit": [
+    "ts.check",
     "build",
     "add-build"
   ],
